@@ -2,14 +2,28 @@ name: Update Portfolio Prices
 
 on:
   schedule:
-    # Every 30 minutes during market hours (Mon-Fri, 13:00-21:30 UTC = 8am-4:30pm EST)
-    - cron: '*/30 13-21 * * 1-5'
-    # Also once at market open and close
-    - cron: '30 13 * * 1-5'
-    - cron: '0 21 * * 1-5'
-    # Crypto: every 30 mins around the clock
+    # ── London market hours: Mon-Fri 08:00-16:30 BST = 07:00-15:30 UTC ──
+    - cron: '*/30 7-15 * * 1-5'
+    - cron: '30 15 * * 1-5'       # London close (15:30 UTC)
+
+    # ── US pre-market: Mon-Fri 04:00-09:30 EST = 09:00-14:30 UTC ──
+    - cron: '*/30 9-13 * * 1-5'
+    - cron: '0 9 * * 1-5'         # Pre-market open
+
+    # ── US market hours: Mon-Fri 09:30-16:00 EST = 14:30-21:00 UTC ──
+    - cron: '*/30 14-20 * * 1-5'
+    - cron: '30 14 * * 1-5'       # US market open
+    - cron: '0 21 * * 1-5'        # US market close
+
+    # ── US after-hours: Mon-Fri 16:00-20:00 EST = 21:00-01:00 UTC ──
+    - cron: '*/30 21-23 * * 1-5'
+    - cron: '0 0 * * 2-6'
+    - cron: '30 0 * * 2-6'
+
+    # ── Crypto: every 30 mins 24/7 ──
     - cron: '*/30 * * * *'
-  workflow_dispatch:  # Allow manual trigger from GitHub UI
+
+  workflow_dispatch:
 
 jobs:
   update-prices:
@@ -31,30 +45,30 @@ jobs:
           FINNHUB_KEY = os.environ.get('FINNHUB_KEY', '')
 
           holdings = [
-            {"ticker":"APLD",  "finnhub":"APLD",            "cat":"stock",  "yahoo":"APLD",    "coingecko":None},
-            {"ticker":"SOUN",  "finnhub":"SOUN",            "cat":"stock",  "yahoo":"SOUN",    "coingecko":None},
-            {"ticker":"HOOD",  "finnhub":"HOOD",            "cat":"stock",  "yahoo":"HOOD",    "coingecko":None},
-            {"ticker":"SOFI",  "finnhub":"SOFI",            "cat":"stock",  "yahoo":"SOFI",    "coingecko":None},
-            {"ticker":"QBTS",  "finnhub":"QBTS",            "cat":"stock",  "yahoo":"QBTS",    "coingecko":None},
-            {"ticker":"TSLA",  "finnhub":"TSLA",            "cat":"stock",  "yahoo":"TSLA",    "coingecko":None},
-            {"ticker":"NVDA",  "finnhub":"NVDA",            "cat":"stock",  "yahoo":"NVDA",    "coingecko":None},
-            {"ticker":"OSCR",  "finnhub":"OSCR",            "cat":"stock",  "yahoo":"OSCR",    "coingecko":None},
-            {"ticker":"GRAB",  "finnhub":"GRAB",            "cat":"stock",  "yahoo":"GRAB",    "coingecko":None},
-            {"ticker":"PLTR",  "finnhub":"PLTR",            "cat":"stock",  "yahoo":"PLTR",    "coingecko":None},
-            {"ticker":"RKLB",  "finnhub":"RKLB",            "cat":"stock",  "yahoo":"RKLB",    "coingecko":None},
-            {"ticker":"HIMS",  "finnhub":"HIMS",            "cat":"stock",  "yahoo":"HIMS",    "coingecko":None},
-            {"ticker":"BMNR",  "finnhub":"BMNR",            "cat":"stock",  "yahoo":"BMNR",    "coingecko":None},
-            {"ticker":"QQQ",   "finnhub":"QQQ",             "cat":"etf",    "yahoo":"QQQ",     "coingecko":None},
-            {"ticker":"IVV",   "finnhub":"IVV",             "cat":"etf",    "yahoo":"IVV",     "coingecko":None},
-            {"ticker":"INDA",  "finnhub":"INDA",            "cat":"etf",    "yahoo":"INDA",    "coingecko":None},
-            {"ticker":"SLV",   "finnhub":"SLV",             "cat":"etf",    "yahoo":"SLV",     "coingecko":None},
-            {"ticker":"IAU",   "finnhub":"IAU",             "cat":"etf",    "yahoo":"IAU",     "coingecko":None},
-            {"ticker":"XRP",   "finnhub":None,              "cat":"crypto", "yahoo":"XRP-USD", "coingecko":"ripple"},
-            {"ticker":"SOL",   "finnhub":None,              "cat":"crypto", "yahoo":"SOL-USD", "coingecko":"solana"},
-            {"ticker":"BTC",   "finnhub":None,              "cat":"crypto", "yahoo":"BTC-USD", "coingecko":"bitcoin"},
-            {"ticker":"ETH",   "finnhub":None,              "cat":"crypto", "yahoo":"ETH-USD", "coingecko":"ethereum"},
-            {"ticker":"AAF.L", "finnhub":None,              "cat":"uk",     "yahoo":"AAF.L",   "coingecko":None},
-            {"ticker":"RR.L",  "finnhub":None,              "cat":"uk",     "yahoo":"RR.L",    "coingecko":None},
+            {"ticker":"APLD",  "finnhub":"APLD",  "cat":"stock",  "yahoo":"APLD",    "coingecko":None},
+            {"ticker":"SOUN",  "finnhub":"SOUN",  "cat":"stock",  "yahoo":"SOUN",    "coingecko":None},
+            {"ticker":"HOOD",  "finnhub":"HOOD",  "cat":"stock",  "yahoo":"HOOD",    "coingecko":None},
+            {"ticker":"SOFI",  "finnhub":"SOFI",  "cat":"stock",  "yahoo":"SOFI",    "coingecko":None},
+            {"ticker":"QBTS",  "finnhub":"QBTS",  "cat":"stock",  "yahoo":"QBTS",    "coingecko":None},
+            {"ticker":"TSLA",  "finnhub":"TSLA",  "cat":"stock",  "yahoo":"TSLA",    "coingecko":None},
+            {"ticker":"NVDA",  "finnhub":"NVDA",  "cat":"stock",  "yahoo":"NVDA",    "coingecko":None},
+            {"ticker":"OSCR",  "finnhub":"OSCR",  "cat":"stock",  "yahoo":"OSCR",    "coingecko":None},
+            {"ticker":"GRAB",  "finnhub":"GRAB",  "cat":"stock",  "yahoo":"GRAB",    "coingecko":None},
+            {"ticker":"PLTR",  "finnhub":"PLTR",  "cat":"stock",  "yahoo":"PLTR",    "coingecko":None},
+            {"ticker":"RKLB",  "finnhub":"RKLB",  "cat":"stock",  "yahoo":"RKLB",    "coingecko":None},
+            {"ticker":"HIMS",  "finnhub":"HIMS",  "cat":"stock",  "yahoo":"HIMS",    "coingecko":None},
+            {"ticker":"BMNR",  "finnhub":"BMNR",  "cat":"stock",  "yahoo":"BMNR",    "coingecko":None},
+            {"ticker":"QQQ",   "finnhub":"QQQ",   "cat":"etf",    "yahoo":"QQQ",     "coingecko":None},
+            {"ticker":"IVV",   "finnhub":"IVV",   "cat":"etf",    "yahoo":"IVV",     "coingecko":None},
+            {"ticker":"INDA",  "finnhub":"INDA",  "cat":"etf",    "yahoo":"INDA",    "coingecko":None},
+            {"ticker":"SLV",   "finnhub":"SLV",   "cat":"etf",    "yahoo":"SLV",     "coingecko":None},
+            {"ticker":"IAU",   "finnhub":"IAU",   "cat":"etf",    "yahoo":"IAU",     "coingecko":None},
+            {"ticker":"XRP",   "finnhub":None,    "cat":"crypto", "yahoo":"XRP-USD", "coingecko":"ripple"},
+            {"ticker":"SOL",   "finnhub":None,    "cat":"crypto", "yahoo":"SOL-USD", "coingecko":"solana"},
+            {"ticker":"BTC",   "finnhub":None,    "cat":"crypto", "yahoo":"BTC-USD", "coingecko":"bitcoin"},
+            {"ticker":"ETH",   "finnhub":None,    "cat":"crypto", "yahoo":"ETH-USD", "coingecko":"ethereum"},
+            {"ticker":"AAF.L", "finnhub":None,    "cat":"uk",     "yahoo":"AAF.L",   "coingecko":None},
+            {"ticker":"RR.L",  "finnhub":None,    "cat":"uk",     "yahoo":"RR.L",    "coingecko":None},
           ]
 
           prices = {}
@@ -68,11 +82,12 @@ jobs:
                   print(f"  FAILED {url[:60]}: {e}")
                   return None
 
-          # ── 1. CoinGecko for crypto ──────────────────────────────────
+          # ── 1. CoinGecko for crypto (24/7) ──────────────────────────
           print("Fetching crypto via CoinGecko...")
           crypto = [h for h in holdings if h['cat'] == 'crypto']
           ids = ','.join(h['coingecko'] for h in crypto if h['coingecko'])
-          cg_url = f"https://api.coingecko.com/api/v3/simple/price?ids={ids}&vs_currencies=usd&include_24hr_change=true&precision=6"
+          cg_url = (f"https://api.coingecko.com/api/v3/simple/price"
+                    f"?ids={ids}&vs_currencies=usd&include_24hr_change=true&precision=6")
           cg_data = fetch_url(cg_url)
           if cg_data:
               for h in crypto:
@@ -84,10 +99,12 @@ jobs:
                       prices[h['ticker']] = {'price': price, 'prevClose': prev, 'dailyPct': chg_pct, 'source': 'coingecko'}
                       print(f"  {h['ticker']}: ${price:.4f} ({chg_pct*100:+.2f}%)")
 
-          # ── 2. Finnhub for US stocks + ETFs ─────────────────────────
+          # ── 2. Finnhub for US stocks + ETFs (incl. pre/after-hours) ─
           if FINNHUB_KEY:
-              print("Fetching stocks/ETFs via Finnhub...")
+              print("Fetching stocks/ETFs via Finnhub (includes pre/after-hours)...")
               us = [h for h in holdings if h['cat'] in ('stock', 'etf') and h['finnhub']]
+              now_utc = datetime.datetime.utcnow()
+              is_regular = 14 <= now_utc.hour <= 20 and now_utc.weekday() < 5
               for h in us:
                   url = f"https://finnhub.io/api/v1/quote?symbol={h['finnhub']}&token={FINNHUB_KEY}"
                   d = fetch_url(url)
@@ -95,16 +112,18 @@ jobs:
                       price = d['c']
                       prev  = d.get('pc') or price
                       chg   = (price - prev) / prev if prev else 0
-                      prices[h['ticker']] = {'price': price, 'prevClose': prev, 'dailyPct': chg, 'source': 'finnhub'}
-                      print(f"  {h['ticker']}: ${price:.2f} ({chg*100:+.2f}%)")
-                  time.sleep(0.1)  # stay within 60/min rate limit
+                      session = 'finnhub' if is_regular else 'finnhub-ext'
+                      prices[h['ticker']] = {'price': price, 'prevClose': prev, 'dailyPct': chg, 'source': session}
+                      label = '' if is_regular else ' [ext]'
+                      print(f"  {h['ticker']}: ${price:.2f} ({chg*100:+.2f}%){label}")
+                  time.sleep(0.1)
           else:
-              print("No FINNHUB_KEY — skipping Finnhub")
+              print("No FINNHUB_KEY — skipping Finnhub, falling back to Yahoo")
 
-          # ── 3. Yahoo Finance for UK stocks + any missing ────────────
+          # ── 3. Yahoo Finance — UK stocks + any Finnhub misses ───────
           missing = [h for h in holdings if h['ticker'] not in prices]
           if missing:
-              print(f"Fetching {len(missing)} via Yahoo Finance: {[h['ticker'] for h in missing]}")
+              print(f"Fetching {len(missing)} via Yahoo: {[h['ticker'] for h in missing]}")
               for h in missing:
                   url = f"https://query1.finance.yahoo.com/v8/finance/chart/{h['yahoo']}?interval=1d&range=2d"
                   d = fetch_url(url)
@@ -135,8 +154,7 @@ jobs:
           got   = len(prices)
           print(f"\nDone: {got}/{total} prices fetched")
           if got < total:
-              missing_t = [h['ticker'] for h in holdings if h['ticker'] not in prices]
-              print(f"Missing: {missing_t}")
+              print(f"Missing: {[h['ticker'] for h in holdings if h['ticker'] not in prices]}")
           PYEOF
 
       - name: Commit prices.json
@@ -144,7 +162,6 @@ jobs:
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add prices.json
-          # Only commit if file changed
           if git diff --staged --quiet; then
             echo "No price changes — skipping commit"
           else
