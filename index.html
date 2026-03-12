@@ -1865,9 +1865,9 @@ function renderPerfReturns() {
 // ── GITHUB REPO SYNC ──────────────────────────────────────────
 // Set these three values to enable automatic cross-browser sync.
 // Token needs 'repo' scope — create at https://github.com/settings/tokens/new
-var GH_USER  = 'thesundayinvesting';   // e.g. 'thesundayinvesting'
-var GH_REPO  = 'portfolio';   // e.g. 'portfolio'
-var GH_TOKEN = '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';   // e.g. 'ghp_xxxxxxxxxxxxxxxxxxxx'
+var GH_USER  = '';   // e.g. 'thesundayinvesting'
+var GH_REPO  = '';   // e.g. 'portfolio'
+var GH_TOKEN = '';   // e.g. 'ghp_xxxxxxxxxxxxxxxxxxxx'
 var GH_FILE  = 'snapshots.json';
 
 function ghConfigured() {
@@ -1918,9 +1918,12 @@ async function syncCloud(showStatus) {
         if (showStatus) showToast('GITHUB SYNC FAILED — check token', 'warn');
         return;
     }
-    var merged = mergeSnaps(getSnaps(), remote.snaps);
+    var local  = getSnaps();
+    var merged = mergeSnaps(local, remote.snaps);
+    // Only push if we have new local snaps remote doesn't have
+    var needPush = merged.length > remote.snaps.length;
     localStorage.setItem(SNAP_KEY, JSON.stringify(merged));
-    var ok = await ghPutFile(merged, remote.sha);
+    var ok = needPush ? await ghPutFile(merged, remote.sha) : true;
     refreshSnapUI();
     renderBenchChart();
     renderPerfReturns();
@@ -1950,7 +1953,7 @@ function updateCloudBadge() {
 }
 
 // ── INIT ───────────────────────────────────────────────────────
-function init() {
+async function init() {
     recompute();
     var cached = loadPrices();
     if (cached) { recompute(); setStatus('CACHED', 'var(--gold)'); }
@@ -1966,7 +1969,7 @@ function init() {
     loadLayout();
     initResizeHandles();
     updateCloudBadge();
-    if (ghConfigured()) { syncCloud(false); }
+    if (ghConfigured()) { await syncCloud(false); }
 }
 
 init();
