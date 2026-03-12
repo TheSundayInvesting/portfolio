@@ -750,6 +750,9 @@ body.resizing { cursor: col-resize !important; }
           <button onclick="clearSnaps()" style="background:transparent;border:1px solid rgba(255,69,96,.3);color:var(--red);padding:5px 10px;font-family:var(--mono);font-size:8px;cursor:pointer;letter-spacing:1px">CLEAR</button>
           <span id="autoSnap" style="font-size:7.5px;color:var(--gold);display:flex;align-items:center;letter-spacing:1px">AUTO-SNAP: --</span>
         </div>
+        <div style="padding:4px 10px 6px;border-bottom:1px solid var(--bord)">
+          <span id="cloudBadge" style="font-size:8px;font-weight:700;color:var(--t3);letter-spacing:1px;cursor:default;">GITHUB: NOT SET</span>
+        </div>
         <div id="snapLog" style="padding:6px 0"></div>
       </div>
     </div>
@@ -1227,6 +1230,7 @@ function saveSnap() {
     snaps.sort(function(a,b){return a.date>b.date?1:-1;});
     localStorage.setItem(SNAP_KEY, JSON.stringify(snaps));
     refreshSnapUI(); renderBenchChart(); renderPerfReturns(); showToast('Snapshot saved');
+    if (ghConfigured()) { syncCloud(false); }
 }
 function clearSnaps() {
     if (!confirm('Clear all snapshots?')) return;
@@ -1357,58 +1361,72 @@ function setStatus(txt, clr) {
 }
 
 // ── YAHOO FETCH ────────────────────────────────────────────────
-async function fetchYahooOne(sym) {
-    try {
-        var url = 'https://query1.finance.yahoo.com/v8/finance/chart/' + sym + '?interval=1d&range=2d';
-        var proxy = 'https://api.allorigins.win/get?url=' + encodeURIComponent(url);
-        var resp = await fetch(proxy, {signal: AbortSignal.timeout(8000)});
-        var json = await resp.json();
-        var data = JSON.parse(json.contents);
-        var res  = data.chart.result[0];
-        var meta = res.meta;
-        var prev = meta.chartPreviousClose || meta.previousClose;
-        var curr = meta.regularMarketPrice;
-        return {todayPrice: curr, prevClose: prev};
-    } catch(e) { return null; }
-}
+// ── PRICE FETCH — reads prices.json written by GitHub Action ──
+// The GitHub Action (.github/workflows/update_prices.yml) runs
+// every 30 mins and writes prices.json to this repo.
+// This page simply reads that file — no API keys needed here.
 
-async function fetchYahoo() {
-    var ok = 0, fail = 0;
-    for (var i = 0; i < holdings.length; i++) {
-        var h = holdings[i];
-        var res = await fetchYahooOne(h.yahoo);
-        if (res && res.todayPrice) {
-            var price = h.cat === 'uk' ? res.todayPrice / 100 : res.todayPrice;
-            var prev  = h.cat === 'uk' && res.prevClose ? res.prevClose / 100 : res.prevClose;
-            h.todayPrice = price;
-            h.prevClose  = prev;
-            h.dailyGain  = (price - prev) * h.qty;
-            h.dailyPct   = (price - prev) / prev;
-            ok++;
-        } else { fail++; }
-    }
-    return {ok, fail};
-}
+var GH_RAW_BASE = 'https://raw.githubusercontent.com/' + GH_USER + '/' + GH_REPO + '/main/';
 
 async function fetchPrices() {
-    setStatus('FETCHING...', 'var(--cyan)');
+    setStatus('LOADING...', 'var(--cyan)');
     var btn = document.getElementById('btnRefresh');
     if (btn) btn.disabled = true;
-    var r = await fetchYahoo();
-    savePrices();
-    recompute();
-    updateTopbar();
-    renderTable();
-    renderCharts();
-    buildTicker();
-    var now = new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-    renderPerfReturns();
-    if (r.ok > 0) {
-        setStatus('OK ' + now, 'var(--grn)');
-        setLive(true);
-    } else {
-        setStatus('FETCH FAILED', 'var(--red)');
+
+    var ok = 0;
+    try {
+        // Add cache-bust so we always get the latest file from GitHub
+        var url  = GH_RAW_BASE + 'prices.json?t=' + Date.now();
+        var res  = await fetch(url, { signal: AbortSignal.timeout(10000) });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        var data = await res.json();
+        var prices = data.prices || {};
+        var updated = data.updated || '';
+
+        holdings.forEach(function(h) {
+            var p = prices[h.ticker];
+            if (p && p.price) {
+                h.todayPrice = p.price;
+                h.prevClose  = p.prevClose || p.price;
+                h.dailyPct   = p.dailyPct  || 0;
+                h.dailyGain  = (h.todayPrice - h.prevClose) * h.qty;
+                h.source     = p.source || '';
+                ok++;
+            }
+        });
+
+        savePrices();
+        recompute();
+        updateTopbar();
+        renderTable();
+        renderCharts();
+        buildTicker();
+        renderPerfReturns();
+
+        var total = holdings.length;
+        var timeStr = updated ? updated.replace('T',' ').replace('Z',' UTC') : new Date().toLocaleTimeString('en-GB');
+        if (ok >= total * 0.8) {
+            setStatus('OK ' + ok + '/' + total + ' · ' + timeStr, 'var(--grn)');
+            setLive(true);
+        } else if (ok > 0) {
+            setStatus('PARTIAL ' + ok + '/' + total + ' · ' + timeStr, 'var(--gold)');
+            setLive(true);
+        } else {
+            setStatus('NO DATA IN prices.json', 'var(--red)');
+        }
+    } catch(e) {
+        console.error('fetchPrices:', e);
+        // Fallback: try to load from localStorage cache
+        var cached = loadPrices();
+        if (cached) {
+            recompute(); updateTopbar(); renderTable(); renderCharts(); buildTicker(); renderPerfReturns();
+            setStatus('CACHED (offline)', 'var(--gold)');
+            setLive(false);
+        } else {
+            setStatus('FAILED — ' + e.message, 'var(--red)');
+        }
     }
+
     if (btn) btn.disabled = false;
     startCdown(300);
 }
@@ -1843,6 +1861,94 @@ function renderPerfReturns() {
     if (badge) badge.textContent = snaps.length + ' SNAP' + (snaps.length !== 1 ? 'S' : '');
 }
 
+
+// ── GITHUB REPO SYNC ──────────────────────────────────────────
+// Set these three values to enable automatic cross-browser sync.
+// Token needs 'repo' scope — create at https://github.com/settings/tokens/new
+var GH_USER  = '';   // e.g. 'thesundayinvesting'
+var GH_REPO  = '';   // e.g. 'portfolio'
+var GH_TOKEN = '';   // e.g. 'ghp_xxxxxxxxxxxxxxxxxxxx'
+var GH_FILE  = 'snapshots.json';
+
+function ghConfigured() {
+    return !!(GH_USER && GH_REPO && GH_TOKEN);
+}
+
+async function ghGetFile() {
+    if (!ghConfigured()) return null;
+    try {
+        var res = await fetch(
+            'https://api.github.com/repos/' + GH_USER + '/' + GH_REPO + '/contents/' + GH_FILE,
+            { headers: { 'Authorization': 'token ' + GH_TOKEN, 'Accept': 'application/vnd.github+json' },
+              signal: AbortSignal.timeout(10000) }
+        );
+        if (res.status === 404) return { snaps: [], sha: null };
+        if (!res.ok) return null;
+        var json = await res.json();
+        var content = JSON.parse(atob(json.content.replace(/\n/g,'')));
+        return { snaps: content, sha: json.sha };
+    } catch(e) { console.warn('GH pull failed:', e); return null; }
+}
+
+async function ghPutFile(snaps, sha) {
+    if (!ghConfigured()) return false;
+    try {
+        var body = {
+            message: 'Portfolio snapshot ' + todayStr(),
+            content: btoa(JSON.stringify(snaps, null, 2)),
+            committer: { name: 'Sunday Investing', email: 'portfolio@sundayinvesting.com' }
+        };
+        if (sha) body.sha = sha;
+        var res = await fetch(
+            'https://api.github.com/repos/' + GH_USER + '/' + GH_REPO + '/contents/' + GH_FILE,
+            { method: 'PUT',
+              headers: { 'Authorization': 'token ' + GH_TOKEN, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json' },
+              body: JSON.stringify(body),
+              signal: AbortSignal.timeout(10000) }
+        );
+        return res.ok;
+    } catch(e) { console.warn('GH push failed:', e); return false; }
+}
+
+async function syncCloud(showStatus) {
+    if (!ghConfigured()) return;
+    if (showStatus) showToast('SYNCING WITH GITHUB...');
+    var remote = await ghGetFile();
+    if (remote === null) {
+        if (showStatus) showToast('GITHUB SYNC FAILED — check token', 'warn');
+        return;
+    }
+    var merged = mergeSnaps(getSnaps(), remote.snaps);
+    localStorage.setItem(SNAP_KEY, JSON.stringify(merged));
+    var ok = await ghPutFile(merged, remote.sha);
+    refreshSnapUI();
+    renderBenchChart();
+    renderPerfReturns();
+    if (showStatus) showToast(ok ? 'SYNCED — ' + merged.length + ' snapshots' : 'PULL OK but push failed', ok ? '' : 'warn');
+    updateCloudBadge();
+}
+
+function mergeSnaps(local, remote) {
+    var map = {};
+    local.forEach(function(s)  { map[s.date] = s; });
+    remote.forEach(function(s) { map[s.date] = s; });
+    var merged = Object.values(map);
+    merged.sort(function(a,b) { return a.date > b.date ? 1 : -1; });
+    return merged;
+}
+
+function updateCloudBadge() {
+    var el = document.getElementById('cloudBadge');
+    if (!el) return;
+    if (ghConfigured()) {
+        el.textContent       = 'GITHUB ✓ SYNC ON';
+        el.style.color       = 'var(--grn)';
+    } else {
+        el.textContent       = 'GITHUB: NOT SET';
+        el.style.color       = 'var(--t3)';
+    }
+}
+
 // ── INIT ───────────────────────────────────────────────────────
 function init() {
     recompute();
@@ -1859,6 +1965,8 @@ function init() {
     renderPerfReturns();
     loadLayout();
     initResizeHandles();
+    updateCloudBadge();
+    if (ghConfigured()) { syncCloud(false); }
 }
 
 init();
