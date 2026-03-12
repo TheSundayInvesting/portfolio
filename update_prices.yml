@@ -168,5 +168,6 @@ jobs:
             UPDATED=$(python3 -c "import json; d=json.load(open('prices.json')); print(d['updated'])")
             COUNT=$(python3 -c "import json; d=json.load(open('prices.json')); print(len(d['prices']))")
             git commit -m "prices: ${COUNT} tickers updated ${UPDATED}"
+            git pull --rebase origin main
             git push
           fi
