@@ -686,7 +686,7 @@ body.resizing { cursor: col-resize !important; }
   <div class="body-area" id="bodyArea">
 
     <!-- LEFT: HOLDINGS -->
-    <div class="panel" id="panelLeft" style="display:flex;flex-direction:column;width:300px;flex-shrink:0;">
+    <div class="panel" id="panelLeft" style="display:flex;flex-direction:column;width:340px;flex-shrink:0;">
       <div class="panel-hd accent-cyan">
         <span class="panel-title">Holdings</span>
         <span class="panel-badge" id="holdCount">-- POSITIONS</span>
@@ -977,7 +977,7 @@ function updateTopbar() {
     }
     var pnl = totalVal - totalCost;
     var pnlPct = pnl / totalCost;
-    document.getElementById('tbVal').textContent  = '$' + totalVal.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+    document.getElementById('tbVal').textContent  = totalVal > 0 ? '$' + totalVal.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}) : 'Loading...';
     document.getElementById('tbPnl').textContent  = (pnl>=0?'+':'-') + '$' + Math.abs(pnl).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
     document.getElementById('tbPnl').style.color  = pnl >= 0 ? 'var(--grn)' : 'var(--red)';
     document.getElementById('tbPnlPct').textContent = (pnlPct>=0?'+':'') + (pnlPct*100).toFixed(2) + '%';
@@ -1041,7 +1041,7 @@ function renderTable() {
             dpCls = h.dailyPct >= 0 ? 'G' : 'L';
             dpStr = (h.dailyPct>=0?'+':'') + (h.dailyPct*100).toFixed(2) + '%';
         }
-        var retStr = (h.gainPct>=0?'+':'') + (h.gainPct*100).toFixed(1) + '%';
+        var retStr = (h.costBasis > 0) ? ((h.gainPct>=0?'+':'') + (h.gainPct*100).toFixed(1) + '%') : '--';
         html += '<tr>';
         html += '<td><span class="cat-dot cd-' + h.cat + '"></span>';
         html += '<div class="h-sym">' + h.ticker + '</div>';
@@ -1052,7 +1052,7 @@ function renderTable() {
             dgCls = h.dailyGain >= 0 ? 'G' : 'L';
             dgStr = (h.dailyGain>=0?'+':'-') + '$' + Math.abs(h.dailyGain).toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0});
         }
-        html += '<td class="' + dgCls + '" style="font-size:9px;">' + dgStr + '</td>';
+        html += '<td class="' + dgCls + '" style="font-size:8.5px;white-space:nowrap;">' + dgStr + '</td>';
         html += '<td class="' + dpCls + '">' + dpStr + '</td>';
         html += '<td class="' + gc + '">' + retStr + '</td>';
         html += '<td>' + fv(h.weight*100,1) + '%';
@@ -1834,7 +1834,11 @@ async function ghGetFile(filename) {
         if (res.status === 404) return { data: null, sha: null };
         if (!res.ok) return null;
         var json = await res.json();
-        var content = JSON.parse(atob(json.content.replace(/\n/g,'')));
+        var b64clean = json.content.replace(/\n/g,'');
+        var binStr   = atob(b64clean);
+        var bytes    = new Uint8Array(binStr.length);
+        for (var i=0; i<binStr.length; i++) bytes[i] = binStr.charCodeAt(i);
+        var content  = JSON.parse(new TextDecoder().decode(bytes));
         return { data: content, sha: json.sha };
     } catch(e) { console.warn('GH GET failed:', e); return null; }
 }
@@ -1842,9 +1846,14 @@ async function ghGetFile(filename) {
 async function ghPutFile(filename, content, sha) {
     if (!ghConfigured()) return false;
     try {
+        // Use TextEncoder-safe base64 to handle all Unicode characters
+        var jsonStr  = JSON.stringify(content, null, 2);
+        var bytes    = new TextEncoder().encode(jsonStr);
+        var binStr   = Array.from(bytes).map(function(b){ return String.fromCharCode(b); }).join('');
+        var b64      = btoa(binStr);
         var body = {
-            message: 'update ' + filename + ' ' + todayStr(),
-            content: btoa(JSON.stringify(content, null, 2)),
+            message: 'snapshot ' + todayStr(),
+            content: b64,
             committer: { name: 'Sunday Investing', email: 'portfolio@sundayinvesting.com' }
         };
         if (sha) body.sha = sha;
@@ -1853,8 +1862,12 @@ async function ghPutFile(filename, content, sha) {
             { method: 'PUT',
               headers: { 'Authorization': 'token ' + GH_TOKEN, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json' },
               body: JSON.stringify(body),
-              signal: AbortSignal.timeout(10000) }
+              signal: AbortSignal.timeout(15000) }
         );
+        if (!res.ok) {
+            var err = await res.json().catch(function(){ return {}; });
+            console.warn('GH PUT failed:', res.status, err.message || '');
+        }
         return res.ok;
     } catch(e) { console.warn('GH PUT failed:', e); return false; }
 }
