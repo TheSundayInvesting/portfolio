@@ -1,0 +1,269 @@
+{
+  "updated": "2026-03-12T00:00:00Z",
+  "holdings": [
+    {
+      "name": "Applied Digital",
+      "ticker": "APLD",
+      "finnhub": "APLD",
+      "cat": "stock",
+      "qty": 210.02841,
+      "avgPrice": 6.948,
+      "yahoo": "APLD",
+      "sector": "Technology",
+      "geo": "US"
+    },
+    {
+      "name": "SoundHound AI",
+      "ticker": "SOUN",
+      "finnhub": "SOUN",
+      "cat": "stock",
+      "qty": 235.04844,
+      "avgPrice": 12.531,
+      "yahoo": "SOUN",
+      "sector": "Technology",
+      "geo": "US"
+    },
+    {
+      "name": "Robinhood Markets",
+      "ticker": "HOOD",
+      "finnhub": "HOOD",
+      "cat": "stock",
+      "qty": 45.51258,
+      "avgPrice": 52.59,
+      "yahoo": "HOOD",
+      "sector": "Finance",
+      "geo": "US"
+    },
+    {
+      "name": "SoFi Technologies",
+      "ticker": "SOFI",
+      "finnhub": "SOFI",
+      "cat": "stock",
+      "qty": 180.69988,
+      "avgPrice": 15.37,
+      "yahoo": "SOFI",
+      "sector": "Finance",
+      "geo": "US"
+    },
+    {
+      "name": "D-Wave Quantum",
+      "ticker": "QBTS",
+      "finnhub": "QBTS",
+      "cat": "stock",
+      "qty": 149.93216,
+      "avgPrice": 5.847,
+      "yahoo": "QBTS",
+      "sector": "Technology",
+      "geo": "US"
+    },
+    {
+      "name": "Tesla",
+      "ticker": "TSLA",
+      "finnhub": "TSLA",
+      "cat": "stock",
+      "qty": 6.04876,
+      "avgPrice": 400.87,
+      "yahoo": "TSLA",
+      "sector": "Consumer/EV",
+      "geo": "US"
+    },
+    {
+      "name": "NVIDIA",
+      "ticker": "NVDA",
+      "finnhub": "NVDA",
+      "cat": "stock",
+      "qty": 16.02535,
+      "avgPrice": 129.07,
+      "yahoo": "NVDA",
+      "sector": "Technology",
+      "geo": "US"
+    },
+    {
+      "name": "Oscar Health",
+      "ticker": "OSCR",
+      "finnhub": "OSCR",
+      "cat": "stock",
+      "qty": 110.94665,
+      "avgPrice": 17.69,
+      "yahoo": "OSCR",
+      "sector": "Healthcare",
+      "geo": "US"
+    },
+    {
+      "name": "Grab Holdings",
+      "ticker": "GRAB",
+      "finnhub": "GRAB",
+      "cat": "stock",
+      "qty": 565.0,
+      "avgPrice": 4.85,
+      "yahoo": "GRAB",
+      "sector": "Technology",
+      "geo": "SE Asia"
+    },
+    {
+      "name": "Palantir",
+      "ticker": "PLTR",
+      "finnhub": "PLTR",
+      "cat": "stock",
+      "qty": 35.08335,
+      "avgPrice": 85.3,
+      "yahoo": "PLTR",
+      "sector": "Technology",
+      "geo": "US"
+    },
+    {
+      "name": "Rocket Lab USA",
+      "ticker": "RKLB",
+      "finnhub": "RKLB",
+      "cat": "stock",
+      "qty": 115.09797,
+      "avgPrice": 23.575,
+      "yahoo": "RKLB",
+      "sector": "Aerospace",
+      "geo": "US"
+    },
+    {
+      "name": "Hims & Hers Health",
+      "ticker": "HIMS",
+      "finnhub": "HIMS",
+      "cat": "stock",
+      "qty": 115.0,
+      "avgPrice": 35.44,
+      "yahoo": "HIMS",
+      "sector": "Healthcare",
+      "geo": "US"
+    },
+    {
+      "name": "Bitmine Immersion",
+      "ticker": "BMNR",
+      "finnhub": "BMNR",
+      "cat": "stock",
+      "qty": 40.0,
+      "avgPrice": 49.09,
+      "yahoo": "BMNR",
+      "sector": "Crypto/Mining",
+      "geo": "US"
+    },
+    {
+      "name": "Invesco QQQ Trust",
+      "ticker": "QQQ",
+      "finnhub": "QQQ",
+      "cat": "etf",
+      "qty": 3.18573,
+      "avgPrice": 545.01,
+      "yahoo": "QQQ",
+      "sector": "ETF-Tech",
+      "geo": "US"
+    },
+    {
+      "name": "iShares S&P 500",
+      "ticker": "IVV",
+      "finnhub": "IVV",
+      "cat": "etf",
+      "qty": 2.66766,
+      "avgPrice": 624.25,
+      "yahoo": "IVV",
+      "sector": "ETF-Broad",
+      "geo": "US"
+    },
+    {
+      "name": "iShares MSCI India",
+      "ticker": "INDA",
+      "finnhub": "INDA",
+      "cat": "etf",
+      "qty": 10.0,
+      "avgPrice": 51.73,
+      "yahoo": "INDA",
+      "sector": "ETF-India",
+      "geo": "India"
+    },
+    {
+      "name": "iShares Silver",
+      "ticker": "SLV",
+      "finnhub": "SLV",
+      "cat": "etf",
+      "qty": 16.0,
+      "avgPrice": 55.54,
+      "yahoo": "SLV",
+      "sector": "ETF-Commodity",
+      "geo": "Global"
+    },
+    {
+      "name": "iShares Gold",
+      "ticker": "IAU",
+      "finnhub": "IAU",
+      "cat": "etf",
+      "qty": 21.54326,
+      "avgPrice": 64.99,
+      "yahoo": "IAU",
+      "sector": "ETF-Commodity",
+      "geo": "Global"
+    },
+    {
+      "name": "XRP",
+      "ticker": "XRP",
+      "finnhub": null,
+      "cat": "crypto",
+      "qty": 501.424267,
+      "avgPrice": 2.4114,
+      "yahoo": "XRP-USD",
+      "sector": "Crypto",
+      "geo": "Global"
+    },
+    {
+      "name": "Solana",
+      "ticker": "SOL",
+      "finnhub": null,
+      "cat": "crypto",
+      "qty": 4.833783,
+      "avgPrice": 170.221,
+      "yahoo": "SOL-USD",
+      "sector": "Crypto",
+      "geo": "Global"
+    },
+    {
+      "name": "Bitcoin",
+      "ticker": "BTC",
+      "finnhub": null,
+      "cat": "crypto",
+      "qty": 0.006644,
+      "avgPrice": 102586.1,
+      "yahoo": "BTC-USD",
+      "sector": "Crypto",
+      "geo": "Global"
+    },
+    {
+      "name": "Ethereum",
+      "ticker": "ETH",
+      "finnhub": null,
+      "cat": "crypto",
+      "qty": 0.498643,
+      "avgPrice": 3286.85,
+      "yahoo": "ETH-USD",
+      "sector": "Crypto",
+      "geo": "Global"
+    },
+    {
+      "name": "Airtel Africa",
+      "ticker": "AAF.L",
+      "finnhub": null,
+      "cat": "uk",
+      "qty": 130.0,
+      "avgPrice": 3.579,
+      "yahoo": "AAF.L",
+      "sector": "Telecom",
+      "geo": "Africa/UK"
+    },
+    {
+      "name": "Rolls-Royce Holdings",
+      "ticker": "RR.L",
+      "finnhub": null,
+      "cat": "uk",
+      "qty": 130.0,
+      "avgPrice": 10.4714,
+      "yahoo": "RR.L",
+      "sector": "Industrials",
+      "geo": "UK"
+    }
+  ]
+}
