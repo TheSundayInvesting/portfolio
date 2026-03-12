@@ -706,7 +706,7 @@ var holdings = []; // loaded from holdings.json via GitHub
 // ── LOAD HOLDINGS FROM GITHUB ─────────────────────────────────
 async function loadHoldings() {
     try {
-        var url  = 'https://raw.githubusercontent.com/' + GH_USER + '/' + GH_REPO + '/main/holdings.json?t=' + Date.now();
+        var url  = 'https://raw.githubusercontent.com/' +  + '/' + GH_REPO + '/main/holdings.json?t=' + Date.now();
         var res  = await fetch(url, {signal: AbortSignal.timeout(10000)});
         if (!res.ok) throw new Error('HTTP ' + res.status);
         var data = await res.json();
@@ -1607,9 +1607,9 @@ function renderPerfReturns() {
 
 
 // ── CONFIG ────────────────────────────────────────────────────
-var GH_USER  = '';   // e.g. 'thesundayinvesting'
-var GH_REPO  = '';   // e.g. 'portfolio'
-var GH_TOKEN = '';   // e.g. 'ghp_xxxxxxxxxxxxxxxxxxxx'
+var   = '';   // e.g. 'thesundayinvesting'
+var GH_REPO  = 'portfolio';   // e.g. 'portfolio'
+var GH_TOKEN = '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';   // e.g. 'ghp_xxxxxxxxxxxxxxxxxxxx'
 var GH_FILE_SNAPS = 'snapshots.json';
 var GH_RAW_BASE   = '';  // set after config in init
 
@@ -1618,7 +1618,7 @@ var _snapsCache = [];
 function getSnaps() { return _snapsCache; }
 
 // ── GITHUB API HELPERS ─────────────────────────────────────────
-function ghConfigured() { return !!(GH_USER && GH_REPO && GH_TOKEN); }
+function ghConfigured() { return !!( && GH_REPO && GH_TOKEN); }
 
 async function ghGetFile(filename) {
     if (!ghConfigured()) return null;
