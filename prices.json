@@ -1,5 +1,5 @@
 {
-  "updated": "2026-03-13T11:01:54Z",
+  "updated": "2026-03-13T11:02:17Z",
   "prices": {
     "XRP": {
       "price": 1.434675,
@@ -134,15 +134,15 @@
       "source": "finnhub-ext"
     },
     "AAF.L": {
-      "price": 3.46062,
+      "price": 3.464,
       "prevClose": 3.3760000000000003,
-      "dailyPct": 0.025065165876777158,
+      "dailyPct": 0.02606635071090036,
       "source": "yahoo"
     },
     "RR.L": {
-      "price": 12.62,
+      "price": 12.63,
       "prevClose": 13.005,
-      "dailyPct": -0.02960399846213007,
+      "dailyPct": -0.028835063437139558,
       "source": "yahoo"
     }
   }
