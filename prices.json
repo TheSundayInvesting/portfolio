@@ -1,28 +1,28 @@
 {
-  "updated": "2026-03-15T10:02:51Z",
+  "updated": "2026-03-15T11:42:00Z",
   "prices": {
     "XRP": {
-      "price": 1.415471,
-      "prevClose": 1.3906832485825358,
-      "dailyPct": 0.017824153302147996,
+      "price": 1.414849,
+      "prevClose": 1.3914175043166206,
+      "dailyPct": 0.01684001790310045,
       "source": "coingecko"
     },
     "SOL": {
-      "price": 88.561237,
-      "prevClose": 86.84529750269593,
-      "dailyPct": 0.019758576994348007,
+      "price": 88.310783,
+      "prevClose": 86.85725517105855,
+      "dailyPct": 0.01673467375959365,
       "source": "coingecko"
     },
     "BTC": {
-      "price": 71816.761448,
-      "prevClose": 70534.43066742246,
-      "dailyPct": 0.01818021026672593,
+      "price": 71691.877698,
+      "prevClose": 70726.97114161482,
+      "dailyPct": 0.01364269586001604,
       "source": "coingecko"
     },
     "ETH": {
-      "price": 2117.633863,
-      "prevClose": 2068.328435978643,
-      "dailyPct": 0.0238382967442151,
+      "price": 2115.887905,
+      "prevClose": 2076.1801375045065,
+      "dailyPct": 0.019125396095553013,
       "source": "coingecko"
     },
     "APLD": {
