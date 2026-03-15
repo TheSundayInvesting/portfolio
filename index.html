@@ -1400,10 +1400,10 @@ function ghConfigured() { return !!(GH_USER && GH_REPO && GH_TOKEN); }
 async function ghGetFile(filename) {
     if (!ghConfigured()) return null;
     try {
-        var res = await fetch(
+        var res = await fetchWithTimeout(
             'https://api.github.com/repos/' + GH_USER + '/' + GH_REPO + '/contents/' + filename,
             { headers: { 'Authorization': 'token ' + GH_TOKEN, 'Accept': 'application/vnd.github+json' },
-              signal: AbortSignal.timeout(10000) }
+              mode: 'cors', cache: 'no-store' }, 10000
         );
         if (res.status === 404) return { data: null, sha: null };
         if (!res.ok) return null;
@@ -1427,11 +1427,11 @@ async function ghPutFile(filename, content, sha) {
         var body    = { message: 'update ' + filename, content: b64,
                         committer: { name: 'Sunday Investing', email: 'portfolio@sundayinvesting.com' } };
         if (sha) body.sha = sha;
-        var res = await fetch(
+        var res = await fetchWithTimeout(
             'https://api.github.com/repos/' + GH_USER + '/' + GH_REPO + '/contents/' + filename,
             { method: 'PUT',
               headers: { 'Authorization': 'token ' + GH_TOKEN, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json' },
-              body: JSON.stringify(body), signal: AbortSignal.timeout(15000) }
+              body: JSON.stringify(body) }, 15000
         );
         if (!res.ok) { var e = await res.json().catch(function(){return{};}); console.warn('GH PUT failed:', res.status, e.message||''); }
         return res.ok;
@@ -1473,7 +1473,7 @@ function updateCloudBadge() {
 async function loadHoldings() {
     try {
         var url = 'https://raw.githubusercontent.com/' + GH_USER + '/' + GH_REPO + '/main/holdings.json?t=' + Date.now();
-        var res = await fetch(url, {signal: AbortSignal.timeout(10000)});
+        var res = await fetchWithTimeout(url, { mode: 'cors', cache: 'no-store' }, 10000);
         if (!res.ok) throw new Error('HTTP ' + res.status);
         var data = await res.json();
         if (data.holdings && data.holdings.length) {
@@ -1493,7 +1493,7 @@ async function fetchPrices() {
     var ok = 0;
     try {
         var url  = 'https://raw.githubusercontent.com/' + GH_USER + '/' + GH_REPO + '/main/prices.json?t=' + Date.now();
-        var res  = await fetch(url, {signal: AbortSignal.timeout(10000)});
+        var res  = await fetchWithTimeout(url, {}, 10000);
         if (!res.ok) throw new Error('HTTP ' + res.status);
         var data    = await res.json();
         var prices  = data.prices  || {};
@@ -1581,6 +1581,279 @@ function resetLayout() {
     if (pl) pl.style.width = '300px';
     if (pr) pr.style.width = '280px';
     showToast('LAYOUT RESET');
+}
+
+
+
+// ── FETCH TIMEOUT HELPER (AbortSignal.timeout not supported in all browsers) ──
+function fetchWithTimeout(url, options, ms) {
+    // Plain fetch — no AbortSignal (causes DataCloneError in some browsers)
+    return fetch(url, options || {});
+}
+
+// ── RESTORED UTILITY FUNCTIONS ──────────────────────────────
+function bstNow() {
+    return new Date(new Date().toLocaleString('en-US', {timeZone:'Europe/London'}));
+}
+
+
+
+function todayStr() {
+    var b = bstNow();
+    return b.getFullYear() + '-' +
+           String(b.getMonth()+1).padStart(2,'0') + '-' +
+           String(b.getDate()).padStart(2,'0');
+}
+
+
+
+function checkAutoSnap() {
+    var b = bstNow();
+    var label = String(b.getHours()).padStart(2,'0') + ':' + String(b.getMinutes()).padStart(2,'0');
+    var el = document.getElementById('autoSnap');
+    if (el) {
+        var hasToday = hasTodaySnap();
+        el.textContent = 'AUTO-SNAP: ' + (hasToday ? todayStr() + ' ✓' : 'PENDING 22:00');
+        el.style.color = hasToday ? 'var(--grn)' : 'var(--gold)';
+    }
+    // Fire at 22:00 exactly
+    if (b.getHours() === 22 && b.getMinutes() === 0) {
+        autoSnapIfNeeded(false);
+    }
+}
+
+
+
+function refreshSnapUI() {
+    var snaps = getSnaps();
+    document.getElementById('snapCount2').textContent = snaps.length + ' SAVED';
+    var html = '';
+    snaps.slice().reverse().slice(0,8).forEach(function(s){
+        var pnl = s.totalValue - s.totalCost;
+        html += '<div style="display:flex;align-items:center;justify-content:space-between;padding:4px 10px;border-bottom:1px solid var(--bord)">';
+        html += '<span style="font-size:9px;color:var(--t2)">'+s.date+'</span>';
+        html += '<span style="font-size:9px;color:var(--t1)">$'+s.totalValue.toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0})+'</span>';
+        html += '<span style="font-size:9px;color:'+(pnl>=0?'var(--grn)':'var(--red)')+'">'+(pnl>=0?'+':'-')+'$'+Math.abs(pnl).toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0})+'</span>';
+        html += '</div>';
+    });
+    document.getElementById('snapLog').innerHTML = html || '<div style="padding:12px;color:var(--t3);font-size:9px">No snapshots yet</div>';
+}
+
+
+
+function startCdown(secs) {
+    clearInterval(cdownTmr);
+    var rem = secs;
+    var el = document.getElementById('cdown');
+    function tick() {
+        if (!el) return;
+        if (rem <= 0) { el.textContent = ''; clearInterval(cdownTmr); return; }
+        var m = Math.floor(rem/60), s = rem%60;
+        el.textContent = 'NEXT: ' + m + ':' + String(s).padStart(2,'0');
+        rem--;
+    }
+    tick(); cdownTmr = setInterval(tick, 1000);
+}
+
+
+
+function setLive(on) {
+    var b = document.getElementById('liveBadge');
+    b.className = 'live-badge' + (on?' on':'');
+    document.getElementById('liveText').textContent = on ? 'LIVE' : 'OFFLINE';
+}
+
+
+
+function setStatus(txt, clr) {
+    var el = document.getElementById('statusTxt');
+    el.textContent = txt;
+    el.style.color = clr || 'var(--t3)';
+}
+
+
+
+function showToast(msg, type) {
+    var t = document.getElementById('_toast');
+    if (!t) { t=document.createElement('div'); t.id='_toast'; document.body.appendChild(t); }
+    Object.assign(t.style, {
+        position:'fixed', bottom:'32px', right:'24px', zIndex:'9999',
+        background:'var(--bg2)', border:'1px solid '+(type==='warn'?'rgba(255,69,96,.4)':'rgba(0,212,255,.3)'),
+        color: type==='warn'?'var(--red)':'var(--cyan)',
+        padding:'10px 18px', fontFamily:'var(--mono)', fontSize:'10px',
+        letterSpacing:'1px', textTransform:'uppercase',
+        boxShadow:'0 8px 32px rgba(0,0,0,.6)', opacity:'1', transition:'opacity .3s'
+    });
+    t.textContent = msg;
+    clearTimeout(t._hide);
+    t._hide = setTimeout(function(){t.style.opacity='0';},2500);
+}
+
+
+
+
+
+function exportSnaps() {
+    var snaps = getSnaps();
+    if (!snaps.length){showToast('No snapshots','warn');return;}
+    var blob = new Blob([JSON.stringify(snaps,null,2)],{type:'application/json'});
+    var a = document.createElement('a'); a.href=URL.createObjectURL(blob);
+    a.download='portfolio_snapshots.json'; a.click();
+}
+
+
+
+// ── RESTORED FUNCTIONS ──────────────────────────────────────
+function autoSnapIfNeeded(silent) {
+    // Only auto-snap if prices are live (todayPrice must be fresh)
+    var b = bstNow();
+    var h = b.getHours();
+    // After 22:00 BST and before midnight — trading day is done
+    if (h < 22) return;
+    if (hasTodaySnap()) return;
+    // Need at least one live price to be meaningful
+    var hasLive = holdings.some(function(h){ return h.prevClose != null; });
+    if (!hasLive) return;
+    saveSnap();
+    if (!silent) showToast('AUTO-SNAP SAVED FOR ' + todayStr());
+}
+
+
+function closeModal() {
+    document.getElementById('modalOverlay').classList.remove('open');
+    editIdx = -1;
+}
+
+function deletePosition() {
+    if (editIdx<0) return;
+    var name=holdings[editIdx].name;
+    holdings.splice(editIdx,1);
+    savePrices(); recompute(); updateTopbar(); renderTable(); renderCharts(); buildTicker();
+    closeModal(); showToast('Removed: '+name,'warn');
+}
+
+function hasTodaySnap() {
+    var snaps = getSnaps();
+    var t = todayStr();
+    return snaps.some(function(s){ return s.date === t; });
+}
+
+
+function openAddModal(idx)    { openEditModal(idx); setModalTab('add'); }
+
+function openDeleteModal(idx) { openEditModal(idx); setModalTab('delete'); }
+
+
+function openEditModal(idx) {
+    editIdx = idx;
+    var h = holdings[idx];
+    document.getElementById('modalTitle').textContent = h.name;
+    document.getElementById('modalTicker').textContent = h.ticker + ' · ' + h.sector;
+    document.getElementById('cvQty').textContent   = h.qty.toLocaleString('en-US',{maximumFractionDigits:6});
+    document.getElementById('cvAvg').textContent   = '$' + h.avgPrice.toFixed(h.avgPrice<10?4:2);
+    document.getElementById('cvPrice').textContent = '$' + h.todayPrice.toFixed(h.todayPrice<10?4:2);
+    var pnl = h.gainPct*100;
+    document.getElementById('cvPnl').textContent = (pnl>=0?'+':'')+pnl.toFixed(2)+'%';
+    document.getElementById('cvPnl').style.color  = pnl>=0?'var(--grn)':'var(--red)';
+    document.getElementById('inpQty').value = h.qty;
+    document.getElementById('inpAvg').value = h.avgPrice;
+    document.getElementById('inpAddQty').value = '';
+    document.getElementById('inpAddAvg').value = '';
+    document.getElementById('previewBox').classList.remove('show');
+    document.getElementById('addPreviewBox').classList.remove('show');
+    setModalTab('edit');
+    document.getElementById('modalOverlay').classList.add('open');
+}
+
+function saveEdit() {
+    if (editIdx<0) return;
+    var mode = document.querySelector('.modal-tab.on').id.replace('tab-','');
+    if (mode==='edit') {
+        var qty=parseFloat(document.getElementById('inpQty').value);
+        var avg=parseFloat(document.getElementById('inpAvg').value);
+        if(!qty||qty<=0){alert('Enter valid quantity');return;}
+        if(!avg||avg<=0){alert('Enter valid price');return;}
+        holdings[editIdx].qty=qty; holdings[editIdx].avgPrice=avg;
+        showToast('Updated: '+holdings[editIdx].ticker);
+    } else if (mode==='add') {
+        var addQ=parseFloat(document.getElementById('inpAddQty').value);
+        var addA=parseFloat(document.getElementById('inpAddAvg').value);
+        if(!addQ||addQ<=0){alert('Enter valid quantity');return;}
+        if(!addA||addA<=0) addA=holdings[editIdx].todayPrice;
+        var h=holdings[editIdx];
+        var nq=h.qty+addQ;
+        h.avgPrice=((h.qty*h.avgPrice)+(addQ*addA))/nq;
+        h.qty=nq;
+        showToast('Added to: '+h.ticker);
+    }
+    savePrices(); recompute(); updateTopbar(); renderTable(); renderCharts();
+    closeModal();
+}
+
+function setModalTab(mode) {
+    document.querySelectorAll('.modal-tab').forEach(function(b){b.classList.remove('on');});
+    var tb = document.getElementById('tab-'+mode);
+    if (tb) tb.classList.add('on');
+    document.getElementById('modal-edit-form').style.display   = mode==='edit'  ?'block':'none';
+    document.getElementById('modal-add-form').style.display    = mode==='add'   ?'block':'none';
+    document.getElementById('modal-delete-form').style.display = mode==='delete'?'block':'none';
+    document.getElementById('btnSave').style.display   = mode!=='delete'?'inline-flex':'none';
+    document.getElementById('btnDelete').style.display = mode==='delete'?'inline-flex':'none';
+    if (mode==='delete'&&editIdx>=0) {
+        var h=holdings[editIdx];
+        document.getElementById('deleteMsg').innerHTML =
+            'Remove <strong>'+h.name+' ('+h.ticker+')</strong> from portfolio? This cannot be undone.';
+    }
+}
+
+function updateAddPreview() {
+    if (editIdx<0) return;
+    var h=holdings[editIdx];
+    var addQ=parseFloat(document.getElementById('inpAddQty').value);
+    var addA=parseFloat(document.getElementById('inpAddAvg').value)||h.todayPrice;
+    var box=document.getElementById('addPreviewBox');
+    if(!addQ||addQ<=0){box.classList.remove('show');return;}
+    box.classList.add('show');
+    var nq=h.qty+addQ, na=((h.qty*h.avgPrice)+(addQ*addA))/nq;
+    var nc=nq*na,nv=nq*h.todayPrice,np=nv-nc;
+    document.getElementById('apvQtyOld').textContent=h.qty;
+    document.getElementById('apvQtyNew').textContent=nq.toFixed(4);
+    document.getElementById('apvAvgOld').textContent='$'+h.avgPrice.toFixed(2);
+    document.getElementById('apvAvgNew').textContent='$'+na.toFixed(2);
+    document.getElementById('apvCostNew').textContent='$'+nc.toFixed(2);
+    document.getElementById('apvValNew').textContent ='$'+nv.toFixed(2);
+    document.getElementById('apvPnlNew').textContent =(np>=0?'+':'')+' $'+Math.abs(np).toFixed(2);
+    document.getElementById('apvPnlNew').style.color  =np>=0?'var(--grn)':'var(--red)';
+}
+
+function updateClock() {
+    var now = new Date();
+    document.getElementById('tbClock').textContent =
+        now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    var h = now.getUTCHours(), m = now.getUTCMinutes();
+    var isOpen = (h===14&&m>=30)||(h>14&&h<21)||(h===21&&m===0);
+    var mb = document.getElementById('marketBadge');
+    mb.textContent = isOpen ? 'MARKET: OPEN' : 'MARKET: CLOSED';
+    mb.className   = 'market-badge ' + (isOpen ? 'market-open' : 'market-closed');
+}
+
+function updatePreview() {
+    if (editIdx<0) return;
+    var h=holdings[editIdx];
+    var qty=parseFloat(document.getElementById('inpQty').value);
+    var avg=parseFloat(document.getElementById('inpAvg').value);
+    var box=document.getElementById('previewBox');
+    if(!qty||!avg||(qty===h.qty&&avg===h.avgPrice)){box.classList.remove('show');return;}
+    box.classList.add('show');
+    var nc=qty*avg,nv=qty*h.todayPrice,np=nv-nc;
+    document.getElementById('pvQtyOld').textContent =h.qty;
+    document.getElementById('pvQtyNew').textContent =qty;
+    document.getElementById('pvAvgOld').textContent ='$'+h.avgPrice.toFixed(2);
+    document.getElementById('pvAvgNew').textContent ='$'+avg.toFixed(2);
+    document.getElementById('pvCostNew').textContent='$'+nc.toFixed(2);
+    document.getElementById('pvValNew').textContent ='$'+nv.toFixed(2);
+    document.getElementById('pvPnlNew').textContent =(np>=0?'+':'')+' $'+Math.abs(np).toFixed(2);
+    document.getElementById('pvPnlNew').style.color  =np>=0?'var(--grn)':'var(--red)';
 }
 
 // ── INIT ───────────────────────────────────────────────────────
