@@ -374,13 +374,19 @@ body::after {
 
 /* ── RESIZE HANDLES ──────────────────────── */
 .resize-handle {
-  width: 5px;
+  width: 8px;
   background: var(--bord);
   cursor: col-resize;
   position: relative;
   flex-shrink: 0;
-  transition: background .1s;
+  transition: background .15s;
   z-index: 20;
+  /* Wider invisible hit area */
+  margin: 0 -3px;
+  padding: 0 3px;
+}
+.resize-handle:hover, .resize-handle.dragging {
+  background: var(--cyan);
 }
 .resize-handle::before {
   content: '';
@@ -554,6 +560,7 @@ body.resizing { cursor: col-resize !important; }
 .perf-abs.pos { color: rgba(0,227,150,.6); }
 .perf-abs.neg { color: rgba(255,69,96,.6); }
 
+.resizing, .resizing * { cursor: col-resize !important; user-select: none; }
 </style>
 </head>
 <body>
