@@ -1,136 +1,136 @@
 {
-  "updated": "2026-03-15T11:42:00Z",
+  "updated": "2026-03-15T13:59:28Z",
   "prices": {
     "XRP": {
-      "price": 1.414849,
-      "prevClose": 1.3914175043166206,
-      "dailyPct": 0.01684001790310045,
+      "price": 1.421786,
+      "prevClose": 1.3918911578867155,
+      "dailyPct": 0.021477859058084123,
       "source": "coingecko"
     },
     "SOL": {
-      "price": 88.310783,
-      "prevClose": 86.85725517105855,
-      "dailyPct": 0.01673467375959365,
+      "price": 87.692598,
+      "prevClose": 87.13092792085516,
+      "dailyPct": 0.006446276799152656,
       "source": "coingecko"
     },
     "BTC": {
-      "price": 71691.877698,
-      "prevClose": 70726.97114161482,
-      "dailyPct": 0.01364269586001604,
+      "price": 71542.259473,
+      "prevClose": 70882.78235134235,
+      "dailyPct": 0.009303770249717923,
       "source": "coingecko"
     },
     "ETH": {
-      "price": 2115.887905,
-      "prevClose": 2076.1801375045065,
-      "dailyPct": 0.019125396095553013,
+      "price": 2095.096212,
+      "prevClose": 2078.9192126156845,
+      "dailyPct": 0.0077814468624596515,
       "source": "coingecko"
     },
     "APLD": {
-      "price": 27.05,
+      "price": 27.06,
       "prevClose": 27.48,
-      "dailyPct": -0.01564774381368267,
+      "dailyPct": -0.015283842794759887,
       "source": "finnhub-ext"
     },
     "SOUN": {
-      "price": 7.3,
+      "price": 7.31,
       "prevClose": 7.47,
-      "dailyPct": -0.02275769745649263,
+      "dailyPct": -0.02141900937081662,
       "source": "finnhub-ext"
     },
     "HOOD": {
-      "price": 73.39,
+      "price": 73.41,
       "prevClose": 76.12,
-      "dailyPct": -0.03586442459274834,
+      "dailyPct": -0.035601681555438885,
       "source": "finnhub-ext"
     },
     "SOFI": {
-      "price": 17.76,
+      "price": 17.77,
       "prevClose": 17.7,
-      "dailyPct": 0.003389830508474705,
+      "dailyPct": 0.003954802259887022,
       "source": "finnhub-ext"
     },
     "QBTS": {
-      "price": 17.55,
+      "price": 17.56,
       "prevClose": 17.83,
-      "dailyPct": -0.01570386988222084,
+      "dailyPct": -0.015143017386427347,
       "source": "finnhub-ext"
     },
     "TSLA": {
-      "price": 391.2,
+      "price": 391.22,
       "prevClose": 395.01,
-      "dailyPct": -0.009645325434799125,
+      "dailyPct": -0.00959469380522003,
       "source": "finnhub-ext"
     },
     "NVDA": {
-      "price": 180.25,
+      "price": 180.27,
       "prevClose": 183.14,
-      "dailyPct": -0.015780277383422445,
+      "dailyPct": -0.015671071311564793,
       "source": "finnhub-ext"
     },
     "OSCR": {
-      "price": 13.23,
+      "price": 13.24,
       "prevClose": 13,
-      "dailyPct": 0.017692307692307726,
+      "dailyPct": 0.018461538461538477,
       "source": "finnhub-ext"
     },
     "GRAB": {
-      "price": 3.71,
+      "price": 3.72,
       "prevClose": 3.75,
-      "dailyPct": -0.010666666666666677,
+      "dailyPct": -0.007999999999999948,
       "source": "finnhub-ext"
     },
     "PLTR": {
-      "price": 150.95,
+      "price": 150.97,
       "prevClose": 153.5,
-      "dailyPct": -0.01661237785016294,
+      "dailyPct": -0.016482084690553754,
       "source": "finnhub-ext"
     },
     "RKLB": {
-      "price": 68.41,
+      "price": 68.43,
       "prevClose": 68.37,
-      "dailyPct": 0.0005850519233580816,
+      "dailyPct": 0.0008775778850373303,
       "source": "finnhub-ext"
     },
     "HIMS": {
-      "price": 24.77,
+      "price": 24.78,
       "prevClose": 23.84,
-      "dailyPct": 0.039010067114093945,
+      "dailyPct": 0.039429530201342336,
       "source": "finnhub-ext"
     },
     "BMNR": {
-      "price": 20.54,
+      "price": 20.55,
       "prevClose": 20.55,
-      "dailyPct": -0.0004866180048662561,
+      "dailyPct": 0.0,
       "source": "finnhub-ext"
     },
     "QQQ": {
-      "price": 593.72,
+      "price": 593.74,
       "prevClose": 597.26,
-      "dailyPct": -0.005927066939021471,
+      "dailyPct": -0.005893580685128724,
       "source": "finnhub-ext"
     },
     "IVV": {
-      "price": 665.2,
+      "price": 665.22,
       "prevClose": 668.95,
-      "dailyPct": -0.005605800134539203,
+      "dailyPct": -0.005575902533821688,
       "source": "finnhub-ext"
     },
     "INDA": {
-      "price": 48.06,
+      "price": 48.07,
       "prevClose": 48.52,
-      "dailyPct": -0.009480626545754345,
+      "dailyPct": -0.009274525968672771,
       "source": "finnhub-ext"
     },
     "SLV": {
-      "price": 72.69,
+      "price": 72.71,
       "prevClose": 76.48,
-      "dailyPct": -0.049555439330544016,
+      "dailyPct": -0.04929393305439344,
       "source": "finnhub-ext"
     },
     "IAU": {
-      "price": 94.38,
+      "price": 94.4,
       "prevClose": 95.65,
-      "dailyPct": -0.013277574490329432,
+      "dailyPct": -0.013068478829064296,
       "source": "finnhub-ext"
     },
     "AAF.L": {
