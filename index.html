@@ -144,18 +144,6 @@
 
     td:first-child { text-align: left; font-weight: 500; }
 
-    .mini-chart {
-      height: 60px;
-      background: repeating-linear-gradient(
-        45deg,
-        rgba(0,255,157,0.05),
-        rgba(0,255,157,0.05) 2px,
-        transparent 2px,
-        transparent 4px
-      );
-      margin: 12px 0;
-    }
-
     .refresh-btn {
       background: rgba(0,234,255,0.15);
       color: var(--accent);
@@ -236,7 +224,7 @@
           <th>PRICE</th>
           <th>CHG</th>
           <th>CHG%</th>
-          <th>ALLOC</th>
+          <th>WEIGHT</th>
         </tr>
       </thead>
       <tbody id="holdings-body">
@@ -278,13 +266,13 @@
 // CONFIG – your holdings (edit here)
 // ────────────────────────────────────────────────
 const holdingsData = [
-  { ticker: "SCHB", qty: 1200, avgPrice: 24.50, alloc: 43.0 },
-  { ticker: "SCHF", qty: 950,  avgPrice: 22.80, alloc: 19.5 },
-  { ticker: "VWO",  qty: 320,  avgPrice: 48.10, alloc: 9.4  },
-  { ticker: "VTI",  qty: 85,   avgPrice: 310.00, alloc: 2.2  },
-  { ticker: "AAPL", qty: 45,   avgPrice: 180.00, alloc: 6.5  },
-  { ticker: "MSFT", qty: 18,   avgPrice: 380.00, alloc: 5.1  },
-  // Add your real tickers here...
+  { ticker: "SCHB", qty: 1200, avgPrice: 24.50 },
+  { ticker: "SCHF", qty: 950,  avgPrice: 22.80 },
+  { ticker: "VWO",  qty: 320,  avgPrice: 48.10 },
+  { ticker: "VTI",  qty: 85,   avgPrice: 310.00 },
+  { ticker: "AAPL", qty: 45,   avgPrice: 180.00 },
+  { ticker: "MSFT", qty: 18,   avgPrice: 380.00 },
+  // Add your real positions here...
 ];
 
 // ────────────────────────────────────────────────
@@ -322,11 +310,15 @@ function getClassForChange(n) {
   return n >= 0 ? "gain" : "loss";
 }
 
+function formatWeight(pct) {
+  return pct != null ? pct.toFixed(1) + "%" : "—";
+}
+
 // ────────────────────────────────────────────────
 // FETCH LIVE PRICES FROM FINNHUB
 // ────────────────────────────────────────────────
 async function fetchLivePrices() {
-  if (!FINNHUB_API_KEY || FINNHUB_API_KEY === "d6ev8e1r01qvn4o1788gd6ev8e1r01qvn4o17890") {
+  if (!FINNHUB_API_KEY || FINNHUB_API_KEY === "YOUR_FINNHUB_API_KEY_HERE") {
     document.getElementById("last-update").textContent = "Error: Finnhub API key missing";
     return;
   }
@@ -369,9 +361,20 @@ function updateTimestamp() {
 }
 
 // ────────────────────────────────────────────────
-// RENDER HOLDINGS TABLE
+// CALCULATE WEIGHTS & RENDER HOLDINGS TABLE
 // ────────────────────────────────────────────────
 function renderHoldings() {
+  let totalValue = 0;
+
+  // First pass: calculate total portfolio value
+  holdingsData.forEach(h => {
+    const p = prices[h.ticker] || {};
+    if (p.price != null) {
+      totalValue += h.qty * p.price;
+    }
+  });
+
+  // Second pass: render rows with calculated weights
   const tbody = document.getElementById("holdings-body");
   tbody.innerHTML = "";
 
@@ -381,13 +384,19 @@ function renderHoldings() {
     const chg       = p.change ?? null;
     const chgPct    = p.changePct ?? null;
 
+    let weight = "—";
+    if (totalValue > 0 && current != null) {
+      const positionValue = h.qty * current;
+      weight = formatWeight((positionValue / totalValue) * 100);
+    }
+
     const row = document.createElement("tr");
     row.innerHTML = `
       <td>${h.ticker}</td>
       <td>$${formatPrice(current)}</td>
       <td class="${getClassForChange(chg)}">${formatChange(chg)}</td>
       <td class="${getClassForChange(chgPct)}">${formatPct(chgPct)}</td>
-      <td>${h.alloc}%</td>
+      <td>${weight}</td>
     `;
     tbody.appendChild(row);
   });
