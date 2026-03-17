@@ -1,28 +1,28 @@
 {
-  "updated": "2026-03-17T10:10:32Z",
+  "updated": "2026-03-17T11:11:45Z",
   "prices": {
     "XRP": {
-      "price": 1.506342,
-      "prevClose": 1.473928350885565,
-      "dailyPct": 0.02199133295384429,
+      "price": 1.510033,
+      "prevClose": 1.4742075120869618,
+      "dailyPct": 0.02430152310262078,
       "source": "coingecko"
     },
     "SOL": {
-      "price": 93.879531,
-      "prevClose": 93.37927669902862,
-      "dailyPct": 0.005357230411879854,
+      "price": 93.63652,
+      "prevClose": 93.8355754150144,
+      "dailyPct": -0.0021213214085811253,
       "source": "coingecko"
     },
     "BTC": {
-      "price": 73689.344421,
-      "prevClose": 73348.77450361384,
-      "dailyPct": 0.004643157567266339,
+      "price": 73910.747263,
+      "prevClose": 73649.00402283989,
+      "dailyPct": 0.0035539277636251897,
       "source": "coingecko"
     },
     "ETH": {
-      "price": 2312.018003,
-      "prevClose": 2266.964167848872,
-      "dailyPct": 0.019874083494614718,
+      "price": 2320.895043,
+      "prevClose": 2275.130970237859,
+      "dailyPct": 0.020114917936946815,
       "source": "coingecko"
     },
     "APLD": {
@@ -134,15 +134,15 @@
       "source": "finnhub-ext"
     },
     "AAF.L": {
-      "price": 3.68084,
+      "price": 3.662,
       "prevClose": 3.5060000000000002,
-      "dailyPct": 0.0498687963491157,
+      "dailyPct": 0.044495151169423756,
       "source": "yahoo"
     },
     "RR.L": {
-      "price": 12.355,
+      "price": 12.32,
       "prevClose": 12.155,
-      "dailyPct": 0.016454134101193015,
+      "dailyPct": 0.01357466063348424,
       "source": "yahoo"
     }
   }
