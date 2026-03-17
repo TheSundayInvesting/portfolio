@@ -1,0 +1,10 @@
+{
+  "updated": "2026-03-17T15:12:00Z",
+  "prices": {
+    "AAPL":    { "price": 214.65, "dailyPct": 1.24 },
+    "MSFT":    { "price": 418.40, "dailyPct": 0.87 },
+    "TSLA":    { "price": 259.10, "dailyPct": -2.15 },
+    "VTI":     { "price": 289.75, "dailyPct": 0.62 },
+    "BTC-USD": { "price": 87420,  "dailyPct": 3.80 }
+  }
+}
