@@ -2,8 +2,8 @@
   "updated": "2026-03-17T14:30:00Z",
   "holdings": [
     {
-      "ticker": "AAPL",
-      "name": "Apple Inc.",
+      "ticker": "NVDA",
+      "name": "NVIDIA Corporation",
       "qty": 42,
       "avgPrice": 168.45
     },
