@@ -290,7 +290,12 @@ body::after {
   background:var(--gold); color:#000; font-size:8px; font-weight:700;
   letter-spacing:2px; padding:0 10px; height:100%; display:flex; align-items:center; flex-shrink:0; z-index:2;
 }
-.news-scroll { display:flex; animation:newsMove 80s linear infinite; }
+.news-scroll { 
+  display:inline-flex; 
+  white-space:nowrap;
+  animation:newsMove 60s linear infinite; 
+  will-change: transform;
+}
 .news-scroll:hover { animation-play-state:paused; }
 .news-item { padding:0 28px; font-size:10px; color:var(--t2); white-space:nowrap; cursor:pointer; transition:color .15s; display:inline-flex; align-items:center; gap:6px; text-decoration:none; height:28px; flex-shrink:0; }
 .news-item:hover { color:var(--cyan); }
@@ -375,20 +380,16 @@ body::after {
 
 /* ── RESIZE HANDLES ──────────────────────── */
 .resize-handle {
-  width: 8px;
-  background: var(--bord);
+  width: 6px;
+  background: var(--bord2);
   cursor: col-resize;
-  position: relative;
   flex-shrink: 0;
   transition: background .15s;
-  z-index: 20;
-  /* Wider invisible hit area */
-  margin: 0 -3px;
-  padding: 0 3px;
+  z-index: 10;
+  position: relative;
 }
-.resize-handle:hover, .resize-handle.dragging {
-  background: var(--cyan);
-}
+.resize-handle:hover { background: var(--cyan); }
+.resize-handle.dragging { background: var(--cyan); }
 .resize-handle::before {
   content: '';
   position: absolute;
@@ -770,8 +771,8 @@ body.resizing { cursor: col-resize !important; }
   <!-- NEWS BAR -->
   <div class="news-bar">
     <div class="news-label">NEWS</div>
-    <div style="overflow:hidden;flex:1;display:flex;align-items:center;">
-      <div class="news-scroll" id="newsScroll"></div>
+    <div style="overflow:hidden;flex:1;position:relative;">
+      <div class="news-scroll" id="newsScroll" style="position:absolute;top:0;left:0;height:100%;display:flex;align-items:center;"></div>
     </div>
   </div>
 
