@@ -22,15 +22,15 @@
       --t3:    #3d4260;
     }
     * { margin:0; padding:0; box-sizing:border-box; }
-    body {
+    html, body {
+      height: 100%;
       background: var(--bg);
       color: var(--t1);
       font-family: 'JetBrains Mono', monospace;
-      font-size: 13px;
-      height: 100vh;
       overflow: hidden;
     }
     .app { height: 100%; display: flex; flex-direction: column; }
+
     .topbar {
       height: 48px;
       background: var(--bg1);
@@ -41,7 +41,12 @@
       gap: 16px;
       flex-shrink: 0;
     }
-    .brand { font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 2px; color: var(--cyan); }
+    .brand {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 24px;
+      letter-spacing: 2px;
+      color: var(--cyan);
+    }
     .notice {
       font-size: 11px;
       color: var(--gold);
@@ -50,7 +55,47 @@
       border-radius: 4px;
       border: 1px solid rgba(240,180,41,0.3);
     }
-    .main { flex: 1; padding: 16px; overflow: auto; }
+
+    .body-area {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+
+    #left-panel {
+      width: 360px;
+      background: var(--card);
+      border-right: 1px solid var(--bord);
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+    #left-panel header {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--bord);
+      font-size: 15px;
+      color: var(--cyan);
+      font-weight: 500;
+    }
+
+    #resize-handle {
+      width: 6px;
+      background: #1e2130;
+      cursor: col-resize;
+      transition: background 0.15s;
+    }
+    #resize-handle:hover,
+    #resize-handle.active {
+      background: var(--cyan);
+    }
+
+    #right-panel {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      background: var(--bg);
+    }
+
     .card {
       background: var(--card);
       border: 1px solid var(--bord);
@@ -59,22 +104,56 @@
       margin-bottom: 16px;
     }
     h2 { color: var(--cyan); margin-bottom: 12px; font-size: 16px; }
-    table { width: 100%; border-collapse: collapse; }
-    th, td { padding: 8px; text-align: right; border-bottom: 1px solid var(--bord); }
-    th { color: var(--t2); font-size: 11px; text-transform: uppercase; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { padding: 8px 10px; text-align: right; border-bottom: 1px solid var(--bord); }
+    th { color: var(--t2); font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+    td:first-child { text-align: left; }
+
     .positive { color: var(--grn); }
     .negative { color: var(--red); }
+
+    .news-bar {
+      height: 32px;
+      background: var(--bg1);
+      border-top: 1px solid var(--bord);
+      overflow: hidden;
+      white-space: nowrap;
+      font-size: 11px;
+      line-height: 32px;
+      color: var(--t2);
+      flex-shrink: 0;
+    }
+    .news-label {
+      background: var(--gold);
+      color: #000;
+      font-weight: bold;
+      padding: 0 12px;
+      display: inline-block;
+      height: 100%;
+      line-height: 32px;
+    }
+    .news-scroll {
+      display: inline-block;
+      padding: 0 40px;
+      animation: news-ticker 80s linear infinite;
+    }
+    .news-scroll:hover { animation-play-state: paused; }
+    @keyframes news-ticker {
+      0%   { transform: translateX(0); }
+      100% { transform: translateX(-100%); }
+    }
+
     .footer-notice {
-      position: fixed;
-      bottom: 12px;
+      position: absolute;
+      bottom: 8px;
       right: 16px;
       font-size: 10px;
       color: var(--t3);
-      background: var(--bg1);
-      padding: 6px 12px;
-      border: 1px solid var(--bord);
+      background: rgba(0,0,0,0.4);
+      padding: 4px 10px;
       border-radius: 4px;
-      z-index: 100;
+      z-index: 10;
     }
   </style>
 </head>
@@ -86,47 +165,70 @@
     <div class="notice">READ-ONLY CENTRALIZED VIEW</div>
   </div>
 
-  <div class="main">
-    <div class="card">
-      <h2>Portfolio Holdings</h2>
-      <table id="holdings-table">
-        <thead>
+  <div class="body-area">
+    <!-- Left: Holdings -->
+    <div id="left-panel">
+      <header>Holdings</header>
+      <table>
+        <thead style="position:sticky; top:0; background:var(--card); z-index:2;">
           <tr>
             <th style="text-align:left">Ticker / Name</th>
             <th>Qty</th>
-            <th>Avg Price</th>
-            <th>Current</th>
+            <th>Avg</th>
+            <th>Price</th>
             <th>Value</th>
-            <th>Day %</th>
-            <th>Total %</th>
           </tr>
         </thead>
         <tbody id="holdings-body"></tbody>
       </table>
     </div>
 
-    <div class="card">
-      <h2>Summary</h2>
-      <div id="summary"></div>
+    <!-- Resize handle -->
+    <div id="resize-handle"></div>
+
+    <!-- Right: content area -->
+    <div id="right-panel">
+      <div class="card">
+        <h2>Summary</h2>
+        <div id="summary"></div>
+      </div>
+
+      <!-- Placeholder for future charts / other sections -->
+      <div class="card">
+        <h2>Performance</h2>
+        <div style="color:var(--t3); font-size:13px; padding:20px 0; text-align:center;">
+          (Charts / allocation coming soon)
+        </div>
+      </div>
     </div>
   </div>
 
+  <!-- News ticker at bottom -->
+  <div class="news-bar">
+    <span class="news-label">LIVE NEWS</span>
+    <span class="news-scroll" id="news-text">
+      • AAPL +1.8% after strong services revenue • TSLA delivery numbers beat estimates • Fed minutes suggest cautious approach in 2026 • Bitcoin breaks $94k • Oil steady ahead of OPEC meeting • Gold near all-time highs • VIX below 16 • European markets mixed • 
+      (static placeholder – real news feed requires proxy or backend)
+    </span>
+  </div>
+
   <div class="footer-notice">
-    Data source: <code>holdings.json</code> & <code>prices.json</code> • Edit via GitHub repo
+    Data from holdings.json & prices.json • Edit via GitHub
   </div>
 </div>
 
 <script>
 // ────────────────────────────────────────────────
-//  READ-ONLY CENTRALIZED DASHBOARD
+//  READ-ONLY CENTRALIZED DASHBOARD + RESIZE + NEWS
 // ────────────────────────────────────────────────
 
-const DATA_REPO = location.hostname; // auto-detects yourusername.github.io
-const HOLDINGS_URL = `https://raw.githubusercontent.com/${DATA_REPO.split('.')[0]}/${DATA_REPO}/main/holdings.json`;
-const PRICES_URL   = `https://raw.githubusercontent.com/${DATA_REPO.split('.')[0]}/${DATA_REPO}/main/prices.json`;
+const REPO_NAME = location.hostname; // yourusername.github.io
+const USER = REPO_NAME.split('.')[0];
+const HOLDINGS_URL = `https://raw.githubusercontent.com/${USER}/${REPO_NAME}/main/holdings.json`;
+const PRICES_URL   = `https://raw.githubusercontent.com/${USER}/${REPO_NAME}/main/prices.json`;
 
 let holdings = [];
-let prices = {};
+let prices   = {};
 
 async function loadData() {
   try {
@@ -145,68 +247,99 @@ async function loadData() {
       prices = data.prices || {};
     }
 
-    render();
+    renderHoldings();
+    renderSummary();
   } catch (err) {
-    document.getElementById('summary').innerHTML = '<div style="color:#ff4560">Error loading data</div>';
+    document.getElementById('summary').innerHTML =
+      '<div style="color:#ff4560; padding:20px;">Error loading data — check console</div>';
     console.error(err);
   }
 }
 
-function render() {
+function renderHoldings() {
   const tbody = document.getElementById('holdings-body');
   tbody.innerHTML = '';
-
-  let totalValue = 0;
-  let totalCost  = 0;
 
   holdings.forEach(h => {
     const p = prices[h.ticker] || {};
     const current = p.price ?? 0;
     const value   = h.qty * current;
-    const cost    = h.qty * h.avgPrice;
     const dayChg  = p.dailyPct ?? 0;
-    const totalChg = cost ? (value - cost) / cost : 0;
-
-    totalValue += value;
-    totalCost  += cost;
 
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td style="text-align:left">
+      <td>
         <strong>${h.ticker}</strong><br>
-        <span style="color:#7b82a0;font-size:11px">${h.name || ''}</span>
+        <span style="color:var(--t3); font-size:11px;">${h.name || '—'}</span>
       </td>
-      <td>${h.qty.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:4})}</td>
+      <td>${h.qty.toLocaleString(undefined,{minimumFractionDigits: h.qty % 1 ? 4 : 0})}</td>
       <td>$${h.avgPrice.toFixed(2)}</td>
       <td>$${current.toFixed(2)}</td>
       <td>$${value.toLocaleString(undefined,{minimumFractionDigits:0})}</td>
-      <td class="${dayChg>=0?'positive':'negative'}">${dayChg.toFixed(2)}%</td>
-      <td class="${totalChg>=0?'positive':'negative'}">${(totalChg*100).toFixed(2)}%</td>
     `;
     tbody.appendChild(tr);
   });
+}
 
-  const pnl = totalValue - totalCost;
+function renderSummary() {
+  let totalValue = 0;
+  let totalCost  = 0;
+
+  holdings.forEach(h => {
+    const current = (prices[h.ticker]?.price) ?? 0;
+    totalValue += h.qty * current;
+    totalCost  += h.qty * h.avgPrice;
+  });
+
+  const pnl    = totalValue - totalCost;
   const pnlPct = totalCost ? (pnl / totalCost) * 100 : 0;
 
   document.getElementById('summary').innerHTML = `
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; font-size:14px;">
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px; font-size:15px;">
       <div>
-        <div style="color:#7b82a0;font-size:11px">TOTAL VALUE</div>
-        <div style="font-size:24px;font-weight:600">$${totalValue.toLocaleString()}</div>
+        <div style="color:var(--t2); font-size:11px; margin-bottom:4px;">TOTAL VALUE</div>
+        <div style="font-size:28px; font-weight:600">$${totalValue.toLocaleString()}</div>
       </div>
       <div>
-        <div style="color:#7b82a0;font-size:11px">TOTAL P&L</div>
-        <div style="font-size:24px;font-weight:600" class="${pnl>=0?'positive':'negative'}">
-          ${pnl>=0?'+':'−'}$${Math.abs(pnl).toLocaleString()} (${pnlPct.toFixed(2)}%)
+        <div style="color:var(--t2); font-size:11px; margin-bottom:4px;">P&L</div>
+        <div style="font-size:28px; font-weight:600;" class="${pnl>=0 ? 'positive' : 'negative'}">
+          ${pnl >= 0 ? '+' : '−'}$${Math.abs(pnl).toLocaleString()} (${pnlPct.toFixed(2)}%)
         </div>
       </div>
     </div>
   `;
 }
 
-// Auto-refresh every 5 minutes
-setInterval(loadData, 300_000);
+// ── RESIZE LOGIC ─────────────────────────────────
+let isResizing = false;
+const leftPanel   = document.getElementById('left-panel');
+const resizeHandle = document.getElementById('resize-handle');
+
+resizeHandle.addEventListener('mousedown', e => {
+  isResizing = true;
+  resizeHandle.classList.add('active');
+  document.body.style.cursor = 'col-resize';
+  e.preventDefault();
+});
+
+document.addEventListener('mousemove', e => {
+  if (!isResizing) return;
+  let w = e.clientX;
+  if (w < 240) w = 240;
+  if (w > 700) w = 700;
+  leftPanel.style.width = w + 'px';
+});
+
+document.addEventListener('mouseup', () => {
+  if (isResizing) {
+    isResizing = false;
+    resizeHandle.classList.remove('active');
+    document.body.style.cursor = '';
+  }
+});
+
+// ── AUTO REFRESH ─────────────────────────────────
+setInterval(loadData, 300000); // 5 minutes
 loadData();
 
 </script>
