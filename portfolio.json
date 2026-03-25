@@ -1,9 +1,0 @@
-[
-  { "sym": "AAPL",    "name": "Apple Inc.",      "shares": 10,   "avgCost": 178.50, "type": "stock"  },
-  { "sym": "MSFT",    "name": "Microsoft Corp.",  "shares": 5,    "avgCost": 390.00, "type": "stock"  },
-  { "sym": "NVDA",    "name": "NVIDIA Corp.",     "shares": 8,    "avgCost": 620.00, "type": "stock"  },
-  { "sym": "BTC-USD", "name": "Bitcoin",          "shares": 0.15, "avgCost": 58000,  "type": "crypto" },
-  { "sym": "ETH-USD", "name": "Ethereum",         "shares": 2,    "avgCost": 3200,   "type": "crypto" },
-  { "sym": "SPY",     "name": "S&P 500 ETF",      "shares": 4,    "avgCost": 450.00, "type": "etf"    },
-  { "sym": "QQQ",     "name": "Nasdaq 100 ETF",   "shares": 3,    "avgCost": 370.00, "type": "etf"    }
-]
