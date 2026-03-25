@@ -1,0 +1,9 @@
+[
+  { "sym": "AAPL",    "shares": 10,   "avgCost": 178.50, "type": "stock"  },
+  { "sym": "MSFT",    "shares": 5,    "avgCost": 390.00, "type": "stock"  },
+  { "sym": "NVDA",    "shares": 8,    "avgCost": 620.00, "type": "stock"  },
+  { "sym": "BTC-USD", "shares": 0.15, "avgCost": 58000,  "type": "crypto" },
+  { "sym": "ETH-USD", "shares": 2,    "avgCost": 3200,   "type": "crypto" },
+  { "sym": "SPY",     "shares": 4,    "avgCost": 450.00, "type": "etf"    },
+  { "sym": "QQQ",     "shares": 3,    "avgCost": 370.00, "type": "etf"    }
+]
